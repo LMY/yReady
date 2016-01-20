@@ -1,0 +1,66 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'eclipse'
+
+def programName = "yReady"
+def versionString = "1.0"
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+	compile 'joda-time:joda-time:2.8'
+	compile 'org.jsoup:jsoup:1.7.2'
+	compile 'javax.mail:mail:1.4'
+//	compile 'com.google.api-client:google-api-client:1.19.1'
+}
+
+
+// you shouldn't need to change anything below 
+
+mainClassName = "y." + programName
+version = versionString + "-build" + getDate()
+
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyMMdd')
+    return formattedDate
+}
+
+repositories {
+    mavenCentral()
+}
+
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': programName,
+                   'Implementation-Version': version,
+					'Class-Path': configurations.compile.collect { "libs/"+it.getName() }.join(' '),
+                   'Main-Class': mainClassName
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar    
+}
+
+task copyLibs(type: Copy) {
+    into "$buildDir/libs/libs"
+    from configurations.runtime
+}
+
+jar {
+	dependsOn copyLibs
+	manifest {
+        attributes 'Implementation-Title': programName,
+                   'Implementation-Version': version,
+                   'Class-Path': configurations.compile.collect { "libs/"+it.getName() }.join(' '),                   
+                   'Main-Class': mainClassName
+    }
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'repos'
+       }
+    }
+}
