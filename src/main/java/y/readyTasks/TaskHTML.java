@@ -7,16 +7,16 @@ import java.net.URL;
 import java.util.List;
 
 import y.utils.GeneralProperties;
-import y.utils.Notifiable;
+import y.utils.Notifier;
 
 public abstract class TaskHTML extends TaskParsable {
 	
-	public TaskHTML(Notifiable tracker, GeneralProperties<String> config, String url, long every) {
-		this(tracker, config, url, every, null);
+	public TaskHTML(Notifier notifier, GeneralProperties<String> config, String url, long every) {
+		this(notifier, config, url, every, null);
 	}
 	
-	public TaskHTML(Notifiable tracker, GeneralProperties<String> config, String url, long every, List<Entry> entries) {
-		super(tracker, config, url, every, entries);
+	public TaskHTML(Notifier notifier, GeneralProperties<String> config, String url, long every, List<Entry> entries) {
+		super(notifier, config, url, every, entries);
 	}
 
 	@Override

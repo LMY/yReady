@@ -243,6 +243,7 @@ public class yReady extends JFrame implements Notifiable {
 	
 	
 	public yReady(GeneralProperties<String> config) {
+		super("yReady");
 		this.config = config;
 				
 		addWindowListener(new WindowAdapter() {
@@ -253,16 +254,14 @@ public class yReady extends JFrame implements Notifiable {
 		});
 		
 		try {
-			tasks = TaskFactory.parse(TaskFactory.TASKS_FILENAME, this, config); 
+			tasks = TaskFactory.parseXML(TaskFactory.TASKS_FILENAME, this, config); 
 		}
 		catch (Exception e) {
 			Utils.MessageBox("Error reading Task file: "+e.getMessage(), "ERROR");
 			tasks = new ArrayList<Task>();
 		}
 		
-		
 		this.setLayout(new BorderLayout());
-		
 		
 		final JPanel center = new JPanel();
 		center.setLayout(new GridLayout(0,2));
@@ -285,13 +284,10 @@ public class yReady extends JFrame implements Notifiable {
 			}
 		});
 		
-		
 		center.add(tableTasks);
 		center.add(new JScrollPane(tableEntries));
 		
 		this.add(center, BorderLayout.CENTER);
-		
-		
 		
 		final JPanel down = new JPanel();
 		down.setLayout(new GridLayout(0,2));
@@ -307,7 +303,6 @@ public class yReady extends JFrame implements Notifiable {
 			}
 		});
 		down.add(check);
-		
 		
 		this.add(down, BorderLayout.SOUTH);
 

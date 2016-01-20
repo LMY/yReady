@@ -1,10 +1,6 @@
 package y.readyTasks;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,88 +18,123 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import y.readyTasks.OutputPolicies.OutputPolicy;
+import y.readyTasks.OutputPolicies.OutputPolicyFactory;
 import y.utils.GeneralProperties;
 import y.utils.Notifiable;
+import y.utils.Notifier;
 import y.utils.Utils;
 
 public class TaskFactory {
 	
 	public final static String SEPARATOR = "\t";
-	public final static String TASKS_FILENAME = Task.TASKS_FOLDER + "tasks.csv";
+	public final static String TASKS_FILENAME = Task.TASKS_FOLDER + "tasks.xml";
 	
-	public static Task parseLine(Notifiable tracker, GeneralProperties<String> config, String line) {
-		final String[] parts = line.split(SEPARATOR);
+	public final static long DEFAULT_TIME = 300;
+	
+	public static String TAG_TASKS_TASKS = "tasks";
+	public static String TAG_TASKS_TASK = "task";
+	public static String TAG_TASKS_TYPE = "type";
+	public static String TAG_TASKS_URL = "url";
+	public static String TAG_TASKS_TIME = "time";
+	public static String TAG_TASKS_OUT = "output";
+	
+	private static Task createTask(Notifiable tracker, GeneralProperties<String> config, String type, String url, String time, String out) {
 		
-		if (parts.length < 2)
+		long itime;
+		try { itime = Long.parseLong(time); }
+		catch (Exception e) { itime = DEFAULT_TIME; }
+		
+		final OutputPolicy policy = OutputPolicyFactory.create(out);
+		if (policy == null)
 			return null;
 		
-		try {
-			final long every = Long.parseLong(parts[1]);
-			
-			if (parts[0].equals("subito"))
-				return new TaskSubito(tracker, config, parts[2], every, null);
-			else if (parts[0].equals("kijiji"))
-				return new TaskKijiji(tracker, config, parts[2], every, null);
-			else if (parts[0].equals("insegreto"))
-				return new TaskInsegreto(tracker, config, parts[2], every, null);
-			else if (parts[0].equals("file"))
-				return new TaskFile(tracker, config, parts[2]);
-			
-//			else if (parts[0].equals("general"))
-//				return new Task(tracker, config, parts[2], every);
-		}
-		catch (Exception e) {}
+		final Notifier notifier = new Notifier(tracker, policy);
 		
-		return null;	// reached if exception is thrown in parseLong or no "else if" matches
+		switch (type) {
+			case "subito" : return new TaskSubito(notifier, config, url, itime, null);
+			case "kijiji" :return new TaskKijiji(notifier, config, url, itime, null);
+			case "insegreto" : return new TaskInsegreto(notifier, config, url, itime, null);
+			case "file" : return new TaskFile(notifier, config, url);
+			default: return null;
+		}
 	}
 	
-	public static String taskToString(Task t) {
-		return t.getType() + SEPARATOR + t.getUrl();
-	}
-	
-
-	public static List<Task> parse(String filename, Notifiable tracker, GeneralProperties<String> config) throws Exception {
+	public static List<Task> parseXML(String filename, Notifiable tracker, GeneralProperties<String> config) throws Exception {
 		
 		List<Task> ret = new ArrayList<Task>();
 		
-		BufferedReader br = null;
-		
 		try {
-			br = new BufferedReader(new FileReader(filename));
+			final File file = new File(filename);
+			final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			final Document doc = dBuilder.parse(file);
+			doc.getDocumentElement().normalize();
+
+			final Element root = doc.getDocumentElement();
+			final NodeList nodes = root.getChildNodes();
 			
-			String line;
-			while ((line=br.readLine()) != null) {
-				if (line.isEmpty() || line.startsWith("//"))
-					continue;
-				
-				final Task newtask = parseLine(tracker, config, line.trim());
-				if (newtask != null)
-					ret.add(newtask);
+			for (int i = 0; i < nodes.getLength(); i++) {
+				final Node node = nodes.item(i);
+
+				if (node.getNodeType() == Node.ELEMENT_NODE) {
+					final String nodename = node.getNodeName();
+
+					if (nodename.equals(TAG_TASKS_TASK)) {
+						final String type = xmlAttributeGet(node, TAG_TASKS_TYPE);
+						final String url = xmlAttributeGet(node, TAG_URL);
+						final String time = xmlAttributeGet(node, TAG_TASKS_TIME);
+						final String out = xmlAttributeGet(node, TAG_TASKS_OUT);
+
+						final Task t = createTask(tracker, config, type, url, time, out);
+						if (t != null)
+							ret.add(t);
+					}
+				}
 			}
 		}
-		finally {
-			if (br != null)
-				try { br.close(); }
-				catch (Exception e2) {}
+		catch (Exception e) {
+			Utils.MessageBox("Error reading "+filename+"\n"+e.getMessage(), "ERROR PARSING XML");
 		}
 		
 		return ret;
 	}
 	
-	public static void save(String filename, List<Task> tasks) throws Exception {
-		BufferedWriter br = null;
-		
+	public static boolean saveXML(String filename, List<Task> tasks) throws Exception {
 		try {
-			br = new BufferedWriter(new FileWriter(filename));
+			final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			final DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			final Document doc = docBuilder.newDocument();
+			final Element root = doc.createElement(TAG_TASKS_TASKS);
+			doc.appendChild(root);
 			
-			for (final Task t : tasks)
-				br.write(taskToString(t)+"\n");
+			if (tasks.size() > 0)
+				for (Task t : tasks)
+					root.appendChild(exportXML(doc, t));
+			
+			final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			final Transformer transformer = transformerFactory.newTransformer();
+			final DOMSource source = new DOMSource(doc);
+			final StreamResult result = new StreamResult(new File(filename));
+	 
+			transformer.transform(source, result);
+			return true;
 		}
-		finally {
-			if (br != null)
-				try { br.close(); }
-				catch (Exception e2) {}
+		catch (Exception e) {
+			return false;
 		}
+	}
+	
+	
+	private static Node exportXML(Document doc, Task t) {
+		final Element rootElement = doc.createElement(TAG_TASKS_TASK);
+		
+		xmlAttributeSet(doc, rootElement, TAG_TASKS_TYPE, t.getType());
+		xmlAttributeSet(doc, rootElement, TAG_TASKS_URL, t.getUrl());
+		xmlAttributeSet(doc, rootElement, TAG_TASKS_TIME, ""+t.getEvery());
+		xmlAttributeSet(doc, rootElement, TAG_TASKS_OUT, ""+t.getOutputString());
+		
+		return rootElement;
 	}
 	
 

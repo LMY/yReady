@@ -10,13 +10,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import y.utils.GeneralProperties;
-import y.utils.Notifiable;
+import y.utils.Notifier;
 import y.utils.Utils;
 
 public class TaskInsegreto extends TaskHTML {
 
-	public TaskInsegreto(Notifiable tracker, GeneralProperties<String> config, String url, long every, List<Entry> entries) {
-		super(tracker, config, url, every, entries);
+	public TaskInsegreto(Notifier notifier, GeneralProperties<String> config, String url, long every, List<Entry> entries) {
+		super(notifier, config, url, every, entries);
 	}
 
 	@Override

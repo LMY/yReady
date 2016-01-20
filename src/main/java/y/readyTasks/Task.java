@@ -5,10 +5,9 @@ import java.io.File;
 import org.joda.time.DateTime;
 
 import y.utils.GeneralProperties;
-import y.utils.Notifiable;
 import y.utils.Notifier;
 
-public abstract class Task extends Notifier {
+public abstract class Task implements Runnable {
 
 	public final static String TASKS_FOLDER = "tasks" + File.separator;
 	
@@ -21,9 +20,12 @@ public abstract class Task extends Notifier {
 	
 	protected DateTime first;
 	protected DateTime last;
+	
+	protected Notifier notifier;
 		
-	public Task(Notifiable tracker, GeneralProperties<String> config, String url, long every) {
-		super(tracker);
+	public Task(Notifier notifier, GeneralProperties<String> config, String url, long every) {
+		super();
+		this.notifier = notifier;
 		this.config = config;
 		this.url = url;
 		this.every = every;
@@ -84,5 +86,10 @@ public abstract class Task extends Notifier {
 	
 	public GeneralProperties<String> getConfig() {
 		return config;
+	}
+	
+	public String getOutputString() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

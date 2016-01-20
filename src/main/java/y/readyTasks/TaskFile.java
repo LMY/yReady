@@ -10,12 +10,12 @@ import java.net.URL;
 import org.joda.time.DateTime;
 
 import y.utils.GeneralProperties;
-import y.utils.Notifiable;
+import y.utils.Notifier;
 
 public class TaskFile extends Task {
 
-	public TaskFile(Notifiable tracker, GeneralProperties<String> config, String url) {
-		super(tracker, config, url, -1);
+	public TaskFile(Notifier notifier, GeneralProperties<String> config, String url) {
+		super(notifier, config, url, -1);
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class TaskFile extends Task {
 
 	@Override
 	public void go() {
-		notify_start();
+		notifier.notify_start();
 		
 		final String url = getUrl();
 		final String folder = getFolder();
@@ -38,12 +38,12 @@ public class TaskFile extends Task {
 			saveContent(url, folder+File.separator+getFilename(url));
 		}
 		catch (Exception e) {
-			notify_message(e.getMessage());
-			notify_abort();
+			notifier.notify_message(e.getMessage());
+			notifier.notify_abort();
 			return; // do not call notify_end()
 		}
 		
-		notify_end();
+		notifier.notify_end();
 	}
 	
 	private static String regExpInvalidFilenameChars = "[?^#]";
