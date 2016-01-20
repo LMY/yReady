@@ -29,7 +29,7 @@ import y.utils.Utils;
 public class TaskFactory {
 	
 	public final static String SEPARATOR = "\t";
-	public final static String TASKS_FILENAME = "tasks.csv";
+	public final static String TASKS_FILENAME = Task.TASKS_FOLDER + "tasks.csv";
 	
 	public static Task parseLine(Notifiable tracker, GeneralProperties<String> config, String line) {
 		final String[] parts = line.split(SEPARATOR);

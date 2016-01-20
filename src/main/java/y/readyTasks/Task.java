@@ -10,6 +10,8 @@ import y.utils.Notifier;
 
 public abstract class Task extends Notifier {
 
+	public final static String TASKS_FOLDER = "tasks" + File.separator;
+	
 	public final static String USER_AGENT = "Mozilla/5.0";
 	
 	private GeneralProperties<String> config;
@@ -38,7 +40,7 @@ public abstract class Task extends Notifier {
 		catch (Exception e) {}
 	}
 	
-	final static String FILENAME_ENTRIES = "entries-debug.xml";
+	final static String FILENAME_ENTRIES = TASKS_FOLDER + "entries-debug.xml";
 	
 	
 	public abstract String getType();
@@ -57,7 +59,7 @@ public abstract class Task extends Notifier {
 	}
 	
 	public String getFolder() {
-		return url.replaceAll("[/:?]", "-");
+		return TASKS_FOLDER + url.replaceAll("[/:?]", "-");
 	}
 	
 	public String getUrl() {
