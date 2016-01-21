@@ -48,8 +48,8 @@ public class Notifier {
 		policy.notifyMessage("end", "");
 	}
 	
-	public void notify_new(List<Entry> newentries) {
+	public boolean notify_new(List<Entry> newentries) {
 		tracker.notify_new(this, newentries);
-		policy.notifyNew(newentries);
+		return policy.notifyNew(newentries);
 	}
 }

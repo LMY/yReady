@@ -47,6 +47,9 @@ class OutputPolicyGmail implements OutputPolicy {
 
 	@Override
 	public boolean notifyNew(List<Entry> entries) {
+		if (entries.isEmpty())
+			return true;
+		
 		final String subject = "yReady: "+entries.size()+" new entries";
 		
 		String body = "";

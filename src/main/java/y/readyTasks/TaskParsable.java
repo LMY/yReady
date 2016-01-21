@@ -62,14 +62,14 @@ public abstract class TaskParsable extends Task {
 		
 		final List<Entry> newentries = new ArrayList<Entry>();
 		
+		// find the new entries
 		for (Entry e : newlist)
-			if (!entries.contains(e)) {
+			if (!entries.contains(e))
 				newentries.add(e);
-				entries.add(e);
-			}
 		
-		if (newentries.size() > 0)
-			notifier.notify_new(newentries);
+		if (newentries.size() > 0)					// if there are new entries
+			if (notifier.notify_new(newentries))	// and we could notify successfully
+				entries.addAll(newentries);			// archive them
 	}
 	
 	public List<Entry> getEntries() {
