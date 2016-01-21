@@ -6,22 +6,27 @@ import y.readyTasks.Entry;
 
 class OutputPolicyNone implements OutputPolicy {
 	@Override
-	public void notifyNew(Entry entry) {
+	public boolean notifyNew(Entry entry) {
+		return true;
 	}
 
 	@Override
-	public void notifyNew(List<Entry> entries) {
+	public boolean notifyNew(List<Entry> entries) {
+		return true;
 	}
 
 	@Override
-	public void notifyExisting(Entry entry) {
+	public boolean notifyExisting(Entry entry) {
+		return true;
 	}
 
 	@Override
-	public void notifyExisting(List<Entry> entries) {
+	public boolean notifyExisting(List<Entry> entries) {
+		return true;
 	}
 
 	@Override
-	public void notifyMessage(String type, String msg) {
+	public boolean notifyMessage(String type, String msg) {
+		return true;
 	}
 }

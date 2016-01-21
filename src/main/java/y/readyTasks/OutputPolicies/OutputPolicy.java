@@ -5,11 +5,11 @@ import java.util.List;
 import y.readyTasks.Entry;
 
 public interface OutputPolicy {
-	public void notifyNew(Entry entry);
-	public void notifyNew(List<Entry> entries);
+	public boolean notifyNew(Entry entry);
+	public boolean notifyNew(List<Entry> entries);
 	
-	public void notifyExisting(Entry entry);
-	public void notifyExisting(List<Entry> entries);
+	public boolean notifyExisting(Entry entry);
+	public boolean notifyExisting(List<Entry> entries);
 	
-	public void notifyMessage(String type, String msg);
+	public boolean notifyMessage(String type, String msg);
 }

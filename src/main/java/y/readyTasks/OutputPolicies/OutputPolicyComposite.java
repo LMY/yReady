@@ -13,32 +13,52 @@ class OutputPolicyComposite implements OutputPolicy {
 	
 	
 	@Override
-	public void notifyNew(Entry entry) {
+	public boolean notifyNew(Entry entry) {
+		boolean ret = true;
+		
 		for (OutputPolicy p : policies)
-			p.notifyNew(entry);
+			ret |= p.notifyNew(entry);
+		
+		return ret;
 	}
 
 	@Override
-	public void notifyNew(List<Entry> entries) {
+	public boolean notifyNew(List<Entry> entries) {
+		boolean ret = true;
+		
 		for (OutputPolicy p : policies)
-			p.notifyNew(entries);
+			ret |= p.notifyNew(entries);
+		
+		return ret;
 	}
 
 	@Override
-	public void notifyExisting(Entry entry) {
+	public boolean notifyExisting(Entry entry) {
+		boolean ret = true;
+		
 		for (OutputPolicy p : policies)
-			p.notifyExisting(entry);
+			ret |= p.notifyExisting(entry);
+		
+		return ret;
 	}
 
 	@Override
-	public void notifyExisting(List<Entry> entries) {
+	public boolean notifyExisting(List<Entry> entries) {
+		boolean ret = true;
+		
 		for (OutputPolicy p : policies)
-			p.notifyExisting(entries);
+			ret |= p.notifyExisting(entries);
+		
+		return ret;
 	}
 
 	@Override
-	public void notifyMessage(String type, String msg) {
+	public boolean notifyMessage(String type, String msg) {
+		boolean ret = true;
+		
 		for (OutputPolicy p : policies)
-			p.notifyMessage(type, msg);
+			ret |= p.notifyMessage(type, msg);
+		
+		return ret;
 	}
 }
