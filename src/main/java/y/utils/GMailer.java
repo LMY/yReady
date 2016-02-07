@@ -79,5 +79,4 @@ public class GMailer {
 	    transport.sendMessage(message, message.getAllRecipients());
 	    transport.close();
 	}
-	
 }
