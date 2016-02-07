@@ -18,7 +18,8 @@ import y.utils.Utils;
 import y.utils.UtilsSwing;
 
 public class uiTaskCreator extends JFrame {
-
+	private static final long serialVersionUID = -4085088336611418934L;
+	
 	private JComboBox<String> type;
 	private JTextField url;
 	private JTextField time;
@@ -26,8 +27,13 @@ public class uiTaskCreator extends JFrame {
 	private MainWindow main;
 	private GeneralProperties<String> config;
 	
+	
 	public uiTaskCreator(MainWindow main, GeneralProperties<String> config) {
 		super("Create new task");
+		
+		this.main = main;
+		this.config = config;
+		
 		setLayout(new BorderLayout());
 		
 		final JPanel center = new JPanel();
@@ -43,8 +49,7 @@ public class uiTaskCreator extends JFrame {
 		
 		center.add(new JLabel(" time:"));
 		time = new JTextField();
-		center.add(time);			
-		
+		center.add(time);
 		
 		
 		final JPanel bottom = new JPanel();
@@ -62,7 +67,13 @@ public class uiTaskCreator extends JFrame {
 	}
 	
 	private void ok() {
-		final Task t = TaskFactory.createTask(main, config, (String) type.getSelectedItem(), url.getText(), time.getText(), null);
+		final Task t = TaskFactory.createTask(main, config, (String) type.getSelectedItem(), url.getText(), time.getText(), "none");
+		if (t == null) {
+			Utils.MessageBox("Error creating task. Check parameters", "ERROR");
+			return;
+		}
 		
+		main.newTask(t);
+		dispose();
 	}
 }

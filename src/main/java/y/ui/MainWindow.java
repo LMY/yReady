@@ -38,8 +38,6 @@ public class MainWindow extends JFrame implements Notifiable {
 
 	private GeneralProperties<String> config;
 	
-	private List<Task> tasks = null;
-
 	private JTable tableTasks;
 	private JTable tableEntries;
 	private TaskTableModel tasksModel;
@@ -114,6 +112,15 @@ public class MainWindow extends JFrame implements Notifiable {
 	    public Task getSelected() {
 	    	return tasks.get(tableTasks.getSelectedRow());
 	    }
+
+		public void newTask(Task t) {
+			tasks.add(t);
+			this.fireTableDataChanged();
+		}
+
+		public List<Task> getTasks() {
+			return tasks;
+		}
 	}
 	
 	private class EntryTableModel extends AbstractTableModel
@@ -192,6 +199,8 @@ public class MainWindow extends JFrame implements Notifiable {
 		    }
 		});
 		
+		List<Task> tasks = null;
+
 		try {
 			tasks = TaskFactory.parseXML(TaskFactory.TASKS_FILENAME, this, config); 
 		}
@@ -270,6 +279,8 @@ public class MainWindow extends JFrame implements Notifiable {
 	}
 	
 	public void startAllTasks() {
+		final List<Task> tasks = tasksModel.getTasks();
+
 		for (final Task t : tasks)
 			new Thread(t).start();
 	}
@@ -302,6 +313,8 @@ public class MainWindow extends JFrame implements Notifiable {
 
 	private void onClose() {
 		try {
+			final List<Task> tasks = tasksModel.getTasks();
+
 			TaskFactory.saveXML(TaskFactory.TASKS_FILENAME, tasks);
 		} catch (Exception e) {
 			Utils.MessageBox("Error saving task list:\n"+e.toString(), "ERROR");
@@ -310,5 +323,9 @@ public class MainWindow extends JFrame implements Notifiable {
 	
 	private void New() {
 		new uiTaskCreator(this, config);
+	}
+
+	public void newTask(Task t) {
+		tasksModel.newTask(t);
 	}
 }
