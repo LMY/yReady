@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -29,6 +31,7 @@ import y.utils.GeneralProperties;
 import y.utils.Notifiable;
 import y.utils.Notifier;
 import y.utils.Utils;
+import y.utils.UtilsSwing;
 
 public class MainWindow extends JFrame implements Notifiable {
 	private static final long serialVersionUID = -3035959296179302179L;
@@ -184,7 +187,7 @@ public class MainWindow extends JFrame implements Notifiable {
 				
 		addWindowListener(new WindowAdapter() {
 		    public void windowClosing(WindowEvent e) {
-//		    	onClose();
+		    	onClose();
 		    	System.exit(0);
 		    }
 		});
@@ -242,6 +245,8 @@ public class MainWindow extends JFrame implements Notifiable {
 		
 		this.add(down, BorderLayout.SOUTH);
 
+		CreateMenuBar();
+		
 		setPreferredSize(new Dimension(800, 600));
 
 		pack();
@@ -249,6 +254,19 @@ public class MainWindow extends JFrame implements Notifiable {
 		setVisible(true);
 		
 //		startAllTasks();	// called later, not in constructor
+	}
+	
+	public void CreateMenuBar()
+	{
+		final JMenuBar menubar = new JMenuBar();
+
+		final JMenu filemenu = menubar.add(new JMenu("File"));
+		filemenu.add(UtilsSwing.createMenuitem("New...", ae -> New(), "control N"));
+
+		filemenu.addSeparator();
+		filemenu.add(UtilsSwing.createMenuitem("Quit", ae -> System.exit(0), "control Q"));
+
+		setJMenuBar(menubar);
 	}
 	
 	public void startAllTasks() {
@@ -282,4 +300,15 @@ public class MainWindow extends JFrame implements Notifiable {
 		
 	}
 
+	private void onClose() {
+		try {
+			TaskFactory.saveXML(TaskFactory.TASKS_FILENAME, tasks);
+		} catch (Exception e) {
+			Utils.MessageBox("Error saving task list:\n"+e.toString(), "ERROR");
+		}
+	}
+	
+	private void New() {
+		new uiTaskCreator(this, config);
+	}
 }
