@@ -50,7 +50,7 @@ public class TaskFactory {
 	}
 	
 	
-	private static Task createTask(Notifiable tracker, GeneralProperties<String> config, String type, String url, String time, String out) {
+	public static Task createTask(Notifiable tracker, GeneralProperties<String> config, String type, String url, String time, String out) {
 		
 		long itime;
 		try { itime = Long.parseLong(time); }
