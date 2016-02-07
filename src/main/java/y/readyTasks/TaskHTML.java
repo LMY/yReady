@@ -40,8 +40,8 @@ public abstract class TaskHTML extends TaskParsable {
 		final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("GET");
 		conn.setRequestProperty("User-Agent", USER_AGENT);
-		@SuppressWarnings("unused")
-		final int responseCode = conn.getResponseCode();
+//		@SuppressWarnings("unused")
+//		final int responseCode = conn.getResponseCode();
 		final BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
 		String line;

@@ -50,6 +50,113 @@ public class MainWindow extends JFrame implements Notifiable {
 	private final static Class<?>[] entryColumnTypes = { String.class, String.class, String.class, String.class, String.class, DateTime.class };
 
 	
+	public MainWindow(GeneralProperties<String> config) {
+		super("yReady");
+		this.config = config;
+				
+		addWindowListener(new WindowAdapter() {
+		    public void windowClosing(WindowEvent e) {
+		    	onClose();
+		    	System.exit(0);
+		    }
+		});
+		
+		List<Task> tasks = null;
+
+		try {
+			tasks = TaskFactory.parseXML(TaskFactory.TASKS_FILENAME, this, config); 
+		}
+		catch (Exception e) {
+			Utils.MessageBox("Error reading Task file: "+e.getMessage(), "ERROR");
+			tasks = new ArrayList<Task>();
+		}
+		
+		this.setLayout(new BorderLayout());
+		
+		final JPanel center = new JPanel();
+		center.setLayout(new GridLayout(0,2));
+		
+		tasksModel = new TaskTableModel(tasks);
+		tableTasks = new JTable(tasksModel);
+		tableTasks.addMouseListener(new PopClickListener(createPopup()));
+		
+		entriesModel = new EntryTableModel(new ArrayList<Entry>());
+		tableEntries = new JTable(entriesModel);
+		
+		tableTasks.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				try {
+					tableEntries.setModel(new EntryTableModel(((TaskParsable)tasksModel.getSelected()).getEntries()));
+				}
+				catch (Exception e) {
+					tableEntries.setModel(new EntryTableModel(new ArrayList<Entry>()));
+				}
+			}
+		});
+		
+		center.add(tableTasks);
+		center.add(new JScrollPane(tableEntries));
+		
+		this.add(center, BorderLayout.CENTER);
+		
+		final JPanel down = new JPanel();
+		down.setLayout(new GridLayout(0,2));
+		
+		final JButton check = new JButton("Check");
+		check.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try { tasksModel.getSelected().go(); }
+				catch (Exception ex) {
+					Utils.MessageBox(ex.getMessage(), "ERROR");
+				}
+			}
+		});
+		down.add(check);
+		
+		this.add(down, BorderLayout.SOUTH);
+
+		CreateMenuBar();
+		
+		
+		setPreferredSize(new Dimension(800, 600));
+
+		pack();
+		Utils.centerWindow(this);
+		setVisible(true);
+		
+//		startAllTasks();	// called later, not in constructor
+	}
+	
+	public void CreateMenuBar()
+	{
+		final JMenuBar menubar = new JMenuBar();
+
+		final JMenu filemenu = menubar.add(new JMenu("File"));
+		filemenu.add(UtilsSwing.createMenuitem("New...", ae -> buttonNew(), "control N"));
+
+		filemenu.addSeparator();
+		filemenu.add(UtilsSwing.createMenuitem("Quit", ae -> System.exit(0), "control Q"));
+
+		setJMenuBar(menubar);
+	}
+	
+	private JPopupMenu createPopup() {
+		final JPopupMenu menu = new JPopupMenu();
+		
+		menu.add(UtilsSwing.createMenuitem("Edit...", ae -> buttonEdit()));
+		menu.addSeparator();
+		menu.add(UtilsSwing.createMenuitem("Copy", ae -> buttonCopy()));
+		menu.addSeparator();
+		menu.add(UtilsSwing.createMenuitem("New", ae -> buttonNew()));
+		menu.add(UtilsSwing.createMenuitem("Paste", ae -> buttonPaste()));
+		menu.addSeparator();
+		menu.add(UtilsSwing.createMenuitem("Delete", ae -> buttonDel()));
+	
+		return menu;
+	}
+
 	private class TaskTableModel extends AbstractTableModel
 	{
 		private static final long serialVersionUID = -4916482284819856646L;
@@ -202,114 +309,6 @@ public class MainWindow extends JFrame implements Notifiable {
 	}
 
 	
-	
-	public MainWindow(GeneralProperties<String> config) {
-		super("yReady");
-		this.config = config;
-				
-		addWindowListener(new WindowAdapter() {
-		    public void windowClosing(WindowEvent e) {
-		    	onClose();
-		    	System.exit(0);
-		    }
-		});
-		
-		List<Task> tasks = null;
-
-		try {
-			tasks = TaskFactory.parseXML(TaskFactory.TASKS_FILENAME, this, config); 
-		}
-		catch (Exception e) {
-			Utils.MessageBox("Error reading Task file: "+e.getMessage(), "ERROR");
-			tasks = new ArrayList<Task>();
-		}
-		
-		this.setLayout(new BorderLayout());
-		
-		final JPanel center = new JPanel();
-		center.setLayout(new GridLayout(0,2));
-		
-		tasksModel = new TaskTableModel(tasks);
-		tableTasks = new JTable(tasksModel);
-		tableTasks.addMouseListener(new PopClickListener(createPopup()));
-		
-		entriesModel = new EntryTableModel(new ArrayList<Entry>());
-		tableEntries = new JTable(entriesModel);
-		
-		tableTasks.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent arg0) {
-				try {
-					tableEntries.setModel(new EntryTableModel(((TaskParsable)tasksModel.getSelected()).getEntries()));
-				}
-				catch (Exception e) {
-					tableEntries.setModel(new EntryTableModel(new ArrayList<Entry>()));
-				}
-			}
-		});
-		
-		center.add(tableTasks);
-		center.add(new JScrollPane(tableEntries));
-		
-		this.add(center, BorderLayout.CENTER);
-		
-		final JPanel down = new JPanel();
-		down.setLayout(new GridLayout(0,2));
-		
-		final JButton check = new JButton("Check");
-		check.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try { tasksModel.getSelected().go(); }
-				catch (Exception ex) {
-					Utils.MessageBox(ex.getMessage(), "ERROR");
-				}
-			}
-		});
-		down.add(check);
-		
-		this.add(down, BorderLayout.SOUTH);
-
-		CreateMenuBar();
-		
-		
-		setPreferredSize(new Dimension(800, 600));
-
-		pack();
-		Utils.centerWindow(this);
-		setVisible(true);
-		
-//		startAllTasks();	// called later, not in constructor
-	}
-	
-	public void CreateMenuBar()
-	{
-		final JMenuBar menubar = new JMenuBar();
-
-		final JMenu filemenu = menubar.add(new JMenu("File"));
-		filemenu.add(UtilsSwing.createMenuitem("New...", ae -> buttonNew(), "control N"));
-
-		filemenu.addSeparator();
-		filemenu.add(UtilsSwing.createMenuitem("Quit", ae -> System.exit(0), "control Q"));
-
-		setJMenuBar(menubar);
-	}
-	
-	private JPopupMenu createPopup() {
-		final JPopupMenu menu = new JPopupMenu();
-		
-		menu.add(UtilsSwing.createMenuitem("Edit...", ae -> buttonEdit()));
-		menu.addSeparator();
-		menu.add(UtilsSwing.createMenuitem("Copy", ae -> buttonCopy()));
-		menu.addSeparator();
-		menu.add(UtilsSwing.createMenuitem("New", ae -> buttonNew()));
-		menu.add(UtilsSwing.createMenuitem("Paste", ae -> buttonPaste()));
-		menu.addSeparator();
-		menu.add(UtilsSwing.createMenuitem("Delete", ae -> buttonDel()));
-	
-		return menu;
-	}
-	
 	public void startAllTasks() {
 		final List<Task> tasks = tasksModel.getTasks();
 
@@ -360,7 +359,7 @@ public class MainWindow extends JFrame implements Notifiable {
 	
 	
 	private void buttonEdit() {
-		
+		// TODO Edit task
 	}
 	
 	private void buttonCopy() {

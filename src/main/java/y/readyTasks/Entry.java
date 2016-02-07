@@ -66,4 +66,26 @@ public class Entry {
 	public void setSpec(String spec) {
 		this.spec = spec;
 	}
+	
+	public long getPriceValue() {
+		if (price == null || price.isEmpty())
+			return PRICE_INVALID;
+		
+		final String[] parts = price.split("\\s");
+		
+		// get min price in euro-cents (so "90.000 - 120.000" will return 90k)
+		int min_price = PRICE_INVALID;
+		
+		for (String p : parts)
+			try {
+				final int intvalue = Integer.parseInt(p.replace(".", ""))*100;
+				if (intvalue < min_price)
+					min_price = intvalue;
+			}
+		catch (Exception e) {}
+		
+		return min_price;
+	}
+	
+	public static int PRICE_INVALID = 0;
 }
