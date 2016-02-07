@@ -27,8 +27,11 @@ public class uiTaskCreator extends JFrame {
 	private MainWindow main;
 	private GeneralProperties<String> config;
 	
-	
 	public uiTaskCreator(MainWindow main, GeneralProperties<String> config) {
+		this(main, config, "");
+	}
+	
+	public uiTaskCreator(MainWindow main, GeneralProperties<String> config, String init_url) {
 		super("Create new task");
 		
 		this.main = main;

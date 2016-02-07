@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
@@ -32,6 +33,7 @@ import y.utils.Notifiable;
 import y.utils.Notifier;
 import y.utils.Utils;
 import y.utils.UtilsSwing;
+import y.utils.PopClickListener;
 
 public class MainWindow extends JFrame implements Notifiable {
 	private static final long serialVersionUID = -3035959296179302179L;
@@ -110,14 +112,27 @@ public class MainWindow extends JFrame implements Notifiable {
 	    }
 	    
 	    public Task getSelected() {
+	    	if (tableTasks.getSelectedColumnCount() == 0)
+	    		return null;
+	    	
 	    	return tasks.get(tableTasks.getSelectedRow());
 	    }
+	    
+	    public List<Task> getSelectedTasks() {
+	    	
+	    	final int idx[] = tableTasks.getSelectedRows();
 
-		public void newTask(Task t) {
-			tasks.add(t);
+	    	final List<Task> ret = new ArrayList<Task>();
+	    	for (int i : idx)
+	    		ret.add(tasks.get(i));
+	    	
+	    	return ret;
+	    }
+
+		public void refreshData() {
 			this.fireTableDataChanged();
 		}
-
+		
 		public List<Task> getTasks() {
 			return tasks;
 		}
@@ -216,6 +231,7 @@ public class MainWindow extends JFrame implements Notifiable {
 		
 		tasksModel = new TaskTableModel(tasks);
 		tableTasks = new JTable(tasksModel);
+		tableTasks.addMouseListener(new PopClickListener(createPopup()));
 		
 		entriesModel = new EntryTableModel(new ArrayList<Entry>());
 		tableEntries = new JTable(entriesModel);
@@ -256,6 +272,7 @@ public class MainWindow extends JFrame implements Notifiable {
 
 		CreateMenuBar();
 		
+		
 		setPreferredSize(new Dimension(800, 600));
 
 		pack();
@@ -270,12 +287,27 @@ public class MainWindow extends JFrame implements Notifiable {
 		final JMenuBar menubar = new JMenuBar();
 
 		final JMenu filemenu = menubar.add(new JMenu("File"));
-		filemenu.add(UtilsSwing.createMenuitem("New...", ae -> New(), "control N"));
+		filemenu.add(UtilsSwing.createMenuitem("New...", ae -> buttonNew(), "control N"));
 
 		filemenu.addSeparator();
 		filemenu.add(UtilsSwing.createMenuitem("Quit", ae -> System.exit(0), "control Q"));
 
 		setJMenuBar(menubar);
+	}
+	
+	private JPopupMenu createPopup() {
+		final JPopupMenu menu = new JPopupMenu();
+		
+		menu.add(UtilsSwing.createMenuitem("Edit...", ae -> buttonEdit()));
+		menu.addSeparator();
+		menu.add(UtilsSwing.createMenuitem("Copy", ae -> buttonCopy()));
+		menu.addSeparator();
+		menu.add(UtilsSwing.createMenuitem("New", ae -> buttonNew()));
+		menu.add(UtilsSwing.createMenuitem("Paste", ae -> buttonPaste()));
+		menu.addSeparator();
+		menu.add(UtilsSwing.createMenuitem("Delete", ae -> buttonDel()));
+	
+		return menu;
 	}
 	
 	public void startAllTasks() {
@@ -321,11 +353,42 @@ public class MainWindow extends JFrame implements Notifiable {
 		}
 	}
 	
-	private void New() {
+	public void newTask(Task t) {
+		tasksModel.getTasks().add(t);
+		tasksModel.refreshData();
+	}
+	
+	
+	private void buttonEdit() {
+		
+	}
+	
+	private void buttonCopy() {
+		final List<Task> tasks = tasksModel.getSelectedTasks();
+		if (tasks.size() == 1)
+			Utils.clipboardCopy(tasks.get(0).getUrl());
+	}
+	
+	private void buttonNew() {
 		new uiTaskCreator(this, config);
 	}
-
-	public void newTask(Task t) {
-		tasksModel.newTask(t);
+	
+	private void buttonPaste() {
+		new uiTaskCreator(this, config, Utils.clipboardPaste());
+	}
+	
+	private void buttonDel() {
+		final List<Task> tasks = tasksModel.getSelectedTasks();
+		
+		if (!Utils.MessageBoxYesNo(this, "Are you sure?\n"+tasks.size()+" tasks will be deleted.", "CONFIRM DELETE"))
+			return;
+		
+		boolean reload = false;
+		
+		for (Task t : tasks)
+			reload |= tasksModel.getTasks().remove(t);
+		
+		if (reload)
+			tasksModel.refreshData();
 	}
 }
