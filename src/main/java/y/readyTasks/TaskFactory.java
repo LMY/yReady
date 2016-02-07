@@ -39,6 +39,17 @@ public class TaskFactory {
 	public static String TAG_TASKS_TIME = "time";
 	public static String TAG_TASKS_OUT = "output";
 	
+	static {
+		final File file = new File(Task.TASKS_FOLDER);
+		file.mkdirs();
+		if (!new File(TASKS_FILENAME).exists())
+			try {
+				saveXML(TASKS_FILENAME, new ArrayList<Task>());
+			}
+			catch (Exception e) {}
+	}
+	
+	
 	private static Task createTask(Notifiable tracker, GeneralProperties<String> config, String type, String url, String time, String out) {
 		
 		long itime;
