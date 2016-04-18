@@ -56,7 +56,7 @@ public class TaskFactory {
 		try { itime = Long.parseLong(time); }
 		catch (Exception e) { itime = DEFAULT_TIME; }
 		
-		final OutputPolicy policy = OutputPolicyFactory.create(out);
+		final OutputPolicy policy = OutputPolicyFactory.create(config, out);
 		if (policy == null)
 			return null;
 		
