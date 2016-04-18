@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -80,15 +82,25 @@ public class MainWindow extends JFrame implements Notifiable {
 		
 		entriesModel = new EntryTableModel(new ArrayList<Entry>());
 		tableEntries = new JTable(entriesModel);
+		tableEntries.addMouseListener(new MouseAdapter() {
+		    public void mouseClicked(MouseEvent evt) {
+		        if (evt.getClickCount() == 2) {
+		            final int index = tableEntries.rowAtPoint(evt.getPoint());
+		            doubleClick(index);
+		        }
+		    }
+		});
 		
 		tableTasks.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 				try {
-					tableEntries.setModel(new EntryTableModel(((TaskParsable)tasksModel.getSelected()).getEntries()));
+					entriesModel = new EntryTableModel(((TaskParsable)tasksModel.getSelected()).getEntries());
+					tableEntries.setModel(entriesModel);
 				}
 				catch (Exception e) {
-					tableEntries.setModel(new EntryTableModel(new ArrayList<Entry>()));
+					entriesModel = new EntryTableModel(new ArrayList<Entry>());
+					tableEntries.setModel(entriesModel);
 				}
 			}
 		});
@@ -303,6 +315,17 @@ public class MainWindow extends JFrame implements Notifiable {
 //	    public Entry getSelected() {
 //	    	return entries.get(tableEntries.getSelectedRow());
 //	    }
+	    
+	    public List<Entry> getSelectedEntries() {
+	    	
+	    	final int idx[] = tableEntries.getSelectedRows();
+
+	    	final List<Entry> ret = new ArrayList<Entry>();
+	    	for (int i : idx)
+	    		ret.add(entries.get(i));
+	    	
+	    	return ret;
+	    }
 	}
 
 	
@@ -386,5 +409,17 @@ public class MainWindow extends JFrame implements Notifiable {
 		
 		if (reload)
 			tasksModel.refreshData();
+	}
+	
+	private void doubleClick(int index) {
+//		if (config.get(Boolean.class, "copyOnDoubleClick"))
+//			buttonCopy();
+//		else {
+			final List<Entry> l = entriesModel.getSelectedEntries();
+			if (l.size() != 1)
+				return;
+
+			Utils.clipboardCopy(l.get(0).getUrl());
+//		}
 	}
 }
