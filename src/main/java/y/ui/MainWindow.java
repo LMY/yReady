@@ -17,6 +17,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -73,9 +74,6 @@ public class MainWindow extends JFrame implements Notifiable {
 		
 		this.setLayout(new BorderLayout());
 		
-		final JPanel center = new JPanel();
-		center.setLayout(new GridLayout(0,2));
-		
 		tasksModel = new TaskTableModel(tasks);
 		tableTasks = new JTable(tasksModel);
 		tableTasks.addMouseListener(new PopClickListener(createPopup()));
@@ -95,13 +93,12 @@ public class MainWindow extends JFrame implements Notifiable {
 			}
 		});
 		
-		center.add(tableTasks);
-		center.add(new JScrollPane(tableEntries));
+		final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tableTasks, new JScrollPane(tableEntries));
 		
-		this.add(center, BorderLayout.CENTER);
+		this.add(split, BorderLayout.CENTER);
 		
 		final JPanel down = new JPanel();
-		down.setLayout(new GridLayout(0,2));
+		down.setLayout(new GridLayout(0,1));
 		
 		final JButton check = new JButton("Check");
 		check.addActionListener(new ActionListener() {
