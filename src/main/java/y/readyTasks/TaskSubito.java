@@ -66,7 +66,7 @@ public class TaskSubito extends TaskHTML {
 			final String link = e.select("a").first().attr("href");
 			final String price = getAttr(e, "span.item_price");
 			final String category = getAttr(e, "span.item_category");
-			final String spec = getAttr(e, "span.item_specs");
+			final String spec = getAttr(e, "span.item_specs").replaceFirst("\\s*\\-?\\s*", "").trim();
 			final String datetime = e.select("time").attr("datetime");
 
 			return new Entry(DateTime.parse(datetime, formatter), link, name, price, category, spec);
@@ -76,7 +76,7 @@ public class TaskSubito extends TaskHTML {
 	
 	private static String getAttr(Element e, String what) {
 		try {
-			return e.select(what).first().text();
+			return e.select(what).first().text().replace("\u00A0", " ");
 		}
 		catch (Exception ex) { return ""; }
 	}
