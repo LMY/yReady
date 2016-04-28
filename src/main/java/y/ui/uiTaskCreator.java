@@ -24,18 +24,20 @@ public class uiTaskCreator extends JFrame {
 	private JTextField url;
 	private JTextField time;
 	
+	private Task oldTask;
 	private MainWindow main;
 	private GeneralProperties<String> config;
 	
 	public uiTaskCreator(MainWindow main, GeneralProperties<String> config) {
-		this(main, config, "");
+		this(main, config, null);
 	}
 	
-	public uiTaskCreator(MainWindow main, GeneralProperties<String> config, String init_url) {
+	public uiTaskCreator(MainWindow main, GeneralProperties<String> config, Task oldTask) {
 		super("Create new task");
 		
 		this.main = main;
 		this.config = config;
+		this.oldTask = oldTask;
 		
 		setLayout(new BorderLayout());
 		
@@ -45,15 +47,16 @@ public class uiTaskCreator extends JFrame {
 		center.add(new JLabel(" type:"));
 		type = new JComboBox<String>(new String[]{"subito", "kijiji", "insegreto"});
 		center.add(type);
+		if (oldTask != null)
+			type.setSelectedItem(oldTask.getType());
 		
 		center.add(new JLabel(" url:"));
-		url = new JTextField();
+		url = new JTextField(oldTask == null? "" : oldTask.getUrl());
 		center.add(url);
 		
 		center.add(new JLabel(" time:"));
-		time = new JTextField();
+		time = new JTextField(oldTask == null? "" : ""+oldTask.getEvery());
 		center.add(time);
-		
 		
 		final JPanel bottom = new JPanel();
 		bottom.setLayout(new FlowLayout());
@@ -69,6 +72,8 @@ public class uiTaskCreator extends JFrame {
 		setVisible(true);
 	}
 	
+	public void setUrl(String t) { url.setText(t); }
+	
 	private void ok() {
 		final Task t = TaskFactory.createTask(main, config, (String) type.getSelectedItem(), url.getText(), time.getText(), "none");
 		if (t == null) {
@@ -76,7 +81,11 @@ public class uiTaskCreator extends JFrame {
 			return;
 		}
 		
-		main.newTask(t);
+		if (oldTask == null)
+			main.newTask(t);
+		else
+			main.modifyTask(oldTask, t);
+		
 		dispose();
 	}
 }

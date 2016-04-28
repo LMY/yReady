@@ -377,9 +377,24 @@ public class MainWindow extends JFrame implements Notifiable {
 		tasksModel.refreshData();
 	}
 	
+	public void modifyTask(Task old, Task t) {
+		
+		final List<Task> tasks = tasksModel.getTasks();
+		for (int i=0, imax=tasks.size(); i<imax; i++)
+			if (tasks.get(i) == old) {
+				tasks.remove(i);
+				tasks.add(i, t);				
+				tasksModel.refreshData();
+				return;
+			}
+			
+	}
 	
 	private void buttonEdit() {
-		// TODO Edit task
+		final List<Task> tasks = tasksModel.getSelectedTasks();
+		if (tasks.size() != 1)
+			return;
+		new uiTaskCreator(this, config, tasks.get(0));
 	}
 	
 	private void buttonCopy() {
@@ -393,7 +408,7 @@ public class MainWindow extends JFrame implements Notifiable {
 	}
 	
 	private void buttonPaste() {
-		new uiTaskCreator(this, config, Utils.clipboardPaste());
+		new uiTaskCreator(this, config).setUrl(Utils.clipboardPaste());
 	}
 	
 	private void buttonDel() {
