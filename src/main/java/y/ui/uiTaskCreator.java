@@ -45,7 +45,7 @@ public class uiTaskCreator extends JFrame {
 		center.setLayout(new GridLayout(0,2));
 		
 		center.add(new JLabel(" type:"));
-		type = new JComboBox<String>(new String[]{"subito", "kijiji", "insegreto"});
+		type = new JComboBox<String>(types);
 		center.add(type);
 		if (oldTask != null)
 			type.setSelectedItem(oldTask.getType());
@@ -55,7 +55,7 @@ public class uiTaskCreator extends JFrame {
 		center.add(url);
 		
 		center.add(new JLabel(" time:"));
-		time = new JTextField(oldTask == null? "" : ""+oldTask.getEvery());
+		time = new JTextField(oldTask == null? "300" : ""+oldTask.getEvery());
 		center.add(time);
 		
 		final JPanel bottom = new JPanel();
@@ -72,7 +72,17 @@ public class uiTaskCreator extends JFrame {
 		setVisible(true);
 	}
 	
-	public void setUrl(String t) { url.setText(t); }
+	final static String[] types = new String[]{"subito", "kijiji", "insegreto"};
+	
+	public void setUrl(String t) { 
+		url.setText(t);
+		
+		for (String k : types)
+			if (t.contains(k)) {
+				type.setSelectedItem(k);
+				return;
+			}
+	}
 	
 	private void ok() {
 		final Task t = TaskFactory.createTask(main, config, (String) type.getSelectedItem(), url.getText(), time.getText(), "none");
