@@ -13,6 +13,7 @@ import javax.swing.JTextField;
 
 import y.readyTasks.Task;
 import y.readyTasks.TaskFactory;
+import y.readyTasks.OutputPolicies.OutputPolicyFactory;
 import y.utils.GeneralProperties;
 import y.utils.Utils;
 import y.utils.UtilsSwing;
@@ -85,7 +86,8 @@ public class uiTaskCreator extends JFrame {
 	}
 	
 	private void ok() {
-		final Task t = TaskFactory.createTask(main, config, (String) type.getSelectedItem(), url.getText(), time.getText(), "none");
+		final Task t = TaskFactory.createTask(main, config, OutputPolicyFactory.configPolicy(config), 
+				(String) type.getSelectedItem(), url.getText(), time.getText(), "none");
 		if (t == null) {
 			Utils.MessageBox("Error creating task. Check parameters", "ERROR");
 			return;

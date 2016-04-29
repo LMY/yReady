@@ -11,7 +11,7 @@ public class OutputPolicyFactory {
 	public static OutputPolicy create(GeneralProperties<String> config, String parm) {
 		
 		if (parm.equals(COMMAND_NONE))
-			return new OutputPolicyNone();
+			return null;	//new OutputPolicyNone();
 		else if (parm.startsWith(COMMAND_COMPOSITE)) {
 			final String[] singles = parm.substring(COMMAND_COMPOSITE.length()).split(",");
 			final OutputPolicyComposite comp = new OutputPolicyComposite();
@@ -43,6 +43,13 @@ public class OutputPolicyFactory {
 		
 		// DEFAULT:
 		return
-				new OutputPolicyNone(); //null;
+				null; //new OutputPolicyNone();
+	}
+	
+	private final static OutputPolicy nullPolicy = new OutputPolicyNone();
+	
+	public static OutputPolicy configPolicy(GeneralProperties<String> config) {
+		final OutputPolicy defaultPolicy = create(config, config.get(String.class, "defaultPolicy"));
+		return defaultPolicy != null ? defaultPolicy : nullPolicy;
 	}
 }

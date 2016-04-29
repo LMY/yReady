@@ -50,15 +50,15 @@ public class TaskFactory {
 	}
 	
 	
-	public static Task createTask(Notifiable tracker, GeneralProperties<String> config, String type, String url, String time, String out) {
+	public static Task createTask(Notifiable tracker, GeneralProperties<String> config, OutputPolicy defaultPolicy, String type, String url, String time, String out) {
 		
 		long itime;
 		try { itime = Long.parseLong(time); }
 		catch (Exception e) { itime = DEFAULT_TIME; }
 		
-		final OutputPolicy policy = OutputPolicyFactory.create(config, out);
+		OutputPolicy policy = OutputPolicyFactory.create(config, out);
 		if (policy == null)
-			return null;
+			policy = defaultPolicy;
 		
 		final Notifier notifier = new Notifier(tracker, policy);
 		
@@ -75,6 +75,8 @@ public class TaskFactory {
 		
 		List<Task> ret = new ArrayList<Task>();
 		
+		final OutputPolicy defaultPolicy = OutputPolicyFactory.configPolicy(config);
+
 		try {
 			final File file = new File(filename);
 			final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -97,7 +99,7 @@ public class TaskFactory {
 						final String time = xmlAttributeGet(node, TAG_TASKS_TIME);
 						final String out = xmlAttributeGet(node, TAG_TASKS_OUT);
 
-						final Task t = createTask(tracker, config, type, url, time, out);
+						final Task t = createTask(tracker, config, defaultPolicy, type, url, time, out);
 						if (t != null)
 							ret.add(t);
 					}
