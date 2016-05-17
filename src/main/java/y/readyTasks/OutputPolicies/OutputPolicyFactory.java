@@ -10,7 +10,7 @@ public class OutputPolicyFactory {
 	
 	public static OutputPolicy create(GeneralProperties<String> config, String parm) {
 		
-		if (parm.equals(COMMAND_NONE))
+		if (parm == null || parm.equals(COMMAND_NONE))
 			return null;	//new OutputPolicyNone();
 		else if (parm.startsWith(COMMAND_COMPOSITE)) {
 			final String[] singles = parm.substring(COMMAND_COMPOSITE.length()).split(",");
@@ -25,7 +25,7 @@ public class OutputPolicyFactory {
 		else if (parm.startsWith(COMMAND_GMAIL)) {
 			final String[] singles = parm.substring(COMMAND_GMAIL.length()).split("\\s");
 			
-			if (singles.length == 0)
+			if (singles.length == 0 || (singles.length == 1 && singles[0].isEmpty()))
 				return new OutputPolicyGmail(config.get(String.class, "mailusername"),
 												config.get(String.class, "mailpassword"),
 												config.get(String.class, "mailto"));
