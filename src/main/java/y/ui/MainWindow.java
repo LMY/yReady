@@ -116,7 +116,7 @@ public class MainWindow extends JFrame implements Notifiable {
 		check.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try { tasksModel.getSelected().go(); }
+				try { tasksModel.getSelected().runOnce(); }
 				catch (Exception ex) {
 					Utils.MessageBox(ex.getMessage(), "ERROR");
 				}

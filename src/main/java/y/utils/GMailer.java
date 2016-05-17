@@ -54,29 +54,40 @@ public class GMailer {
 	}
 	
 	public void sendMail(String[] dest, String[] ccs, String subject, String body) throws Exception {
-		
-		final Session session = Session.getDefaultInstance(mailServerProperties, new javax.mail.Authenticator() {
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, password);
-			}
-		});
+		final Thread thread = new Thread() {
+			public void run() {
+				final Session session = Session.getDefaultInstance(mailServerProperties, new javax.mail.Authenticator() {
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(username, password);
+					}
+				});
+			
+				try {
+					final Message message = new MimeMessage(session);
+					message.setFrom(new InternetAddress(username));
+					
+					for (String d : dest)
+						message.addRecipient(Message.RecipientType.TO, new InternetAddress(d));
+					
+					for (String cc : ccs)
+						message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(cc));
+					
+					message.setSubject(subject);
+					message.setText(body);
 	
-		final Message message = new MimeMessage(session);
-		message.setFrom(new InternetAddress(username));
+					// Transport.send(message"); does not work. these lines are needed
+				    final Transport transport = session.getTransport("smtp");
+				    transport.connect("smtp.gmail.com", username, password);
+				    transport.sendMessage(message, message.getAllRecipients());
+				    transport.close();
+				}
+				catch (Exception e) {
+					Utils.MessageBox(e.getMessage()+"\n"+e.toString(), "ERROR sending email");
+				}
+			}
+		};
 		
-		for (String d : dest)
-			message.addRecipient(Message.RecipientType.TO, new InternetAddress(d));
-		
-		for (String cc : ccs)
-			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(cc));
-		
-		message.setSubject(subject);
-		message.setText(body);
+		thread.start();
 
-		// Transport.send(message"); does not work. these lines are needed
-	    final Transport transport = session.getTransport("smtp");
-	    transport.connect("smtp.gmail.com", username, password);
-	    transport.sendMessage(message, message.getAllRecipients());
-	    transport.close();
 	}
 }

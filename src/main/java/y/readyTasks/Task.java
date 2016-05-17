@@ -42,11 +42,11 @@ public abstract class Task implements Runnable {
 		catch (Exception e) {}
 	}
 	
-	final static String FILENAME_ENTRIES = TASKS_FOLDER + "entries-debug.xml";
+	final static String FILENAME_ENTRIES = "entries-debug.xml";
 	
 	
 	public abstract String getType();
-	public abstract void go();
+	protected abstract void go();
 	
 	public void run() {
 		while (true) {
@@ -60,8 +60,20 @@ public abstract class Task implements Runnable {
 		}
 	}
 	
+	public void runOnce() {
+		final Task thisTask = this;
+		
+		final Thread newThread = new Thread() {
+			public void run() {
+				thisTask.go();
+			}
+		};
+		newThread.start();		
+	}
+	
+	
 	public String getFolder() {
-		return TASKS_FOLDER + url.replaceAll("[/:?]", "-");
+		return TASKS_FOLDER + url.replaceAll("[/:?=]", "-");
 	}
 	
 	public String getUrl() {

@@ -184,6 +184,7 @@ public class TaskFactory {
 			return true;
 		}
 		catch (Exception e) {
+			Utils.MessageBox(e.getMessage()+"\n"+e.toString(), "ERROR saving list");
 			return false;
 		}
 	}

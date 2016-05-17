@@ -25,12 +25,12 @@ public class Notifier {
 
 	public void notify_start() {
 		tracker.notify_start(this);
-		policy.notifyMessage("start", "");
+//		policy.notifyMessage("start", "");
 	}
 	
 	public void notify_progress(int value) {
 		tracker.notify_progress(this, value);
-		policy.notifyMessage("progress", ""+value);
+//		policy.notifyMessage("progress", ""+value);
 	}
 	
 	public void notify_message(final String message) {
@@ -40,12 +40,12 @@ public class Notifier {
 	
 	public void notify_abort() {
 		tracker.notify_abort(this);
-		policy.notifyMessage("abort", "");
+//		policy.notifyMessage("abort", "");
 	}
 	
 	public void notify_end() {
 		tracker.notify_end(this);
-		policy.notifyMessage("end", "");
+//		policy.notifyMessage("end", "");
 	}
 	
 	public boolean notify_new(List<Entry> newentries) {
