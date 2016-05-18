@@ -110,7 +110,7 @@ public class MainWindow extends JFrame implements Notifiable {
 		this.add(split, BorderLayout.CENTER);
 		
 		final JPanel down = new JPanel();
-		down.setLayout(new GridLayout(0,1));
+		down.setLayout(new GridLayout(0,2));
 		
 		final JButton check = new JButton("Check");
 		check.addActionListener(new ActionListener() {
@@ -123,6 +123,7 @@ public class MainWindow extends JFrame implements Notifiable {
 			}
 		});
 		down.add(check);
+		down.add(UtilsSwing.createButton("Config", ae -> new ConfigWindow(config))); 
 		
 		this.add(down, BorderLayout.SOUTH);
 

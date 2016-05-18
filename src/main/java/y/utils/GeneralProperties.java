@@ -30,4 +30,7 @@ public class GeneralProperties<KeyType> {
 		
 		((Map<KeyType, V>) themap).put(key, (V) value);
 	}
+	
+	public Map<Class<?>, Map<KeyType, ?>> get() { return maps; }
+	public void clear() { maps.clear(); }
 }
