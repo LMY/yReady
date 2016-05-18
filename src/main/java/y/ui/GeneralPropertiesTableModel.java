@@ -65,14 +65,6 @@ public class GeneralPropertiesTableModel extends AbstractTableModel {
 			values.set(rowIndex, (String) aValue);
 	}
 	
-//	public int getRow(String prop) {
-//		for (int i=0; i<keys.size(); i++)
-//			if (keys.get(i).equals(prop))
-//				return i;
-//		
-//		return -1;
-//	}
-	
     @Override
     public Class<? extends Object> getColumnClass(int column) {
     	return String.class;
@@ -80,7 +72,7 @@ public class GeneralPropertiesTableModel extends AbstractTableModel {
     
     @Override
     public boolean isCellEditable(int row, int column) {
-    	return column != 0;
+    	return true;
     }
     	
 	public void clearData() {
@@ -90,8 +82,6 @@ public class GeneralPropertiesTableModel extends AbstractTableModel {
 		
 		this.fireTableDataChanged();
 	}
-	
-	
 	
 	public void refresh(GeneralProperties<String> config) {
 		keys.clear();
@@ -120,7 +110,6 @@ public class GeneralPropertiesTableModel extends AbstractTableModel {
 		final String s = type.toString();
 		return s.startsWith("class ") ? s.substring(6) : s;
 	}
-	
 	
 	public void save(GeneralProperties<String> config) {
 		config.clear();
