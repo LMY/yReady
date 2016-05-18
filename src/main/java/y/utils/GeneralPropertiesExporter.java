@@ -25,6 +25,11 @@ public class GeneralPropertiesExporter {
 	public final static String TAG_VALUE = "value";
 	public final static String TAG_TYPE = "type";
 	
+	@SuppressWarnings("unchecked")
+	public static <KeyType> GeneralProperties<KeyType> read(String filename) throws Exception {
+		return (GeneralProperties<KeyType>) read(filename, p -> { return p; });
+	}
+	
 	public static <KeyType> GeneralProperties<KeyType> read(String filename, Function<String, KeyType> converter) throws Exception {
 		final File file = new File(filename);
 		final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();

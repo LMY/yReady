@@ -34,7 +34,7 @@ public class yReady {
 		
 		GeneralProperties<String> config = null;
 		try {
-			config = GeneralPropertiesExporter.read(CONFIG_FILENAME, p -> { return p; });
+			config = GeneralPropertiesExporter.read(CONFIG_FILENAME);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;
